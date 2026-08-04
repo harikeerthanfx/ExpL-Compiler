@@ -1,0 +1,3 @@
+
+clean:
+	rm -f y.tab.c y.tab.h lex.yy.c a.out
