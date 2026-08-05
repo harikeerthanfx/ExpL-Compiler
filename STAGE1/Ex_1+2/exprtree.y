@@ -5,6 +5,8 @@
 
     int yylex(void);
     int yyerror(const char *s);
+
+    extern FILE *yyin;
 %}
 
 %union{
@@ -68,8 +70,19 @@ int yyerror(char const *s)
     return 0;
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    if(argc > 1)
+    {
+        yyin = fopen(argv[1], "r");
+
+        if(yyin == NULL)
+        {
+            printf("Cannot open input file\n");
+            return 1;
+        }
+    }
+
     targetFile = fopen("target_file.xsm","w");
 
     fprintf(targetFile,"0\n");

@@ -1,11 +1,12 @@
 %{
-#include<stdio.h>
+    #include<stdio.h>
 
+    int len = 0;
 %}
 
 %%
 
-A[a-zA-Z]+    { if (yyleng == 3) printf("%s\n",yytext);}
+[0-9]+      {len ++; }
 
 .|\n              { }
 
@@ -13,9 +14,9 @@ A[a-zA-Z]+    { if (yyleng == 3) printf("%s\n",yytext);}
 
 int main()
 {
-    printf("Enter the words:\n");
-
+    printf("Enter the number:\n");
     yylex();
+    printf("length = %d",len);
 
     return 0;
 }
