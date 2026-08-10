@@ -1,21 +1,17 @@
 #ifndef EXPRTREE_H
 #define EXPRTREE_H
-#include <stdio.h>
 
-typedef struct tnode{
+typedef struct tnode {
     int val;
-    char *op;
-    struct tnode *left,*right;
+    char op;
+    struct tnode* left;
+    struct tnode* right;
 } tnode;
 
-extern FILE *targetFile;
-
 tnode* makeLeafNode(int n);
-tnode* makeOperatorNode(char c, tnode *l, tnode *r);
-int evaluate(tnode *t);
+tnode* makeOperatorNode(char op, tnode* l, tnode* r);
 
-int getReg();
-void freeReg();
-int codeGen(tnode *t);
+void prefix(tnode* root);
+void postfix(tnode* root);
 
 #endif

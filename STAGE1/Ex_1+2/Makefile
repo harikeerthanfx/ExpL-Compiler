@@ -1,13 +1,13 @@
 all: exprtree
 
-exprtree: y.tab.c lex.yy.c exprtree.c
-	gcc y.tab.c lex.yy.c exprtree.c -o exprtree -lfl
+exprtree: exprtree.tab.c lex.yy.c exprtree.c codegen.c
+	gcc exprtree.tab.c lex.yy.c exprtree.c codegen.c -o exprtree
 
-y.tab.c y.tab.h: exprtree.y
-	yacc -d exprtree.y
+exprtree.tab.c exprtree.tab.h: exprtree.y
+	bison -d exprtree.y
 
-lex.yy.c: exprtree.l y.tab.h
+lex.yy.c: exprtree.l exprtree.tab.h
 	flex exprtree.l
 
 clean:
-	rm -f exprtree y.tab.c y.tab.h lex.yy.c target_file.xsm
+	rm -f exprtree exprtree.tab.c exprtree.tab.h lex.yy.c

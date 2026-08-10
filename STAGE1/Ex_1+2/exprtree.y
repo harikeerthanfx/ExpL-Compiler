@@ -1,102 +1,90 @@
 %{
-    #include <stdlib.h>
-    #include <stdio.h>
-    #include "exprtree.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "exprtree.h"
+#include "codegen.h"
 
-    int yylex(void);
-    int yyerror(const char *s);
+int yylex();
+void yyerror(const char* s);
 
-    extern FILE *yyin;
+FILE* targetFile;
 %}
 
 %union{
-    tnode *no;
+    tnode* node;
 }
 
-%token <no> NUM
-%token PLUS MINUS MUL DIV END
+%token <node> NUM;
+%token PLUS MINUS MUL DIV END;
 
-%type <no> expr program
+%type <node> E program;
 
 %left PLUS MINUS
 %left MUL DIV
 
 %%
 
-program : expr END
-{
-    $$ = $1;
+program : E END {
+    int resultReg = codeGen($1);
+    writeResult(resultReg);
+    freeReg();
+};
 
-    codeGen($1);
-
-    fprintf(targetFile,"MOV SP, 4095\n");
-
-    fprintf(targetFile,"MOV R2, 5\n");
-    fprintf(targetFile,"PUSH R2\n");
-
-    fprintf(targetFile,"MOV R2, -2\n");
-    fprintf(targetFile,"PUSH R2\n");
-
-    fprintf(targetFile,"PUSH R0\n");
-
-    fprintf(targetFile,"PUSH R2\n");
-    fprintf(targetFile,"PUSH R2\n");
-
-    fprintf(targetFile,"INT 7\n");
-
-    fprintf(targetFile,"POP R0\n");
-    fprintf(targetFile,"POP R1\n");
-    fprintf(targetFile,"POP R1\n");
-    fprintf(targetFile,"POP R1\n");
-    fprintf(targetFile,"POP R1\n");
-    fprintf(targetFile,"INT 10\n");
-
-    exit(1);
-}
-
-expr : expr PLUS expr   {$$ = makeOperatorNode('+',$1,$3);}
-     | expr MINUS expr  {$$ = makeOperatorNode('-',$1,$3);}
-     | expr MUL expr    {$$ = makeOperatorNode('*',$1,$3);}
-     | expr DIV expr    {$$ = makeOperatorNode('/',$1,$3);}
-     | '(' expr ')'     {$$ = $2;}
-     | NUM              {$$ = $1;}
-     ;
+E : E PLUS E {
+        $$ = makeOperatorNode('+', $1, $3);
+    }
+    | E MINUS E {
+        $$ = makeOperatorNode('-', $1, $3);
+    }
+    | E MUL E {
+        $$ = makeOperatorNode('*', $1, $3);
+    }
+    | E DIV E {
+        $$ = makeOperatorNode('/', $1, $3);
+    }
+    | '(' E ')' {
+        $$ = $2;
+    }
+    | NUM {
+        $$ = $1;
+    };
 
 %%
 
-int yyerror(char const *s)
-{
-    printf("yyerror %s",s);
-    return 0;
-}
-
-int main(int argc, char *argv[])
-{
-    if(argc > 1)
-    {
-        yyin = fopen(argv[1], "r");
-
-        if(yyin == NULL)
-        {
-            printf("Cannot open input file\n");
-            return 1;
-        }
+extern FILE* yyin; // it is file pointer of lexer. defaulted to "stdin"
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s <inputfile>\n", argv[0]);
+        return 1;
     }
 
-    targetFile = fopen("target_file.xsm","w");
+    yyin = fopen(argv[1], "r");
+    if (yyin == NULL) {
+        printf("Cannot open input file\n");
+        return 1;
+    }
 
-    fprintf(targetFile,"0\n");
-    fprintf(targetFile,"2056\n");
-    fprintf(targetFile,"0\n");
-    fprintf(targetFile,"0\n");
-    fprintf(targetFile,"0\n");
-    fprintf(targetFile,"0\n");
-    fprintf(targetFile,"0\n");
-    fprintf(targetFile,"0\n");
+    targetFile = fopen("target.xsm", "w");
+    if (!targetFile) {
+        printf("Could not open target file\n");
+        exit(1);
+    }
+
+    fprintf(targetFile, "0\n");
+    fprintf(targetFile, "2056\n");
+    fprintf(targetFile, "0\n");
+    fprintf(targetFile, "0\n");
+    fprintf(targetFile, "0\n");
+    fprintf(targetFile, "0\n");
+    fprintf(targetFile, "0\n");
+    fprintf(targetFile, "0\n");
 
     yyparse();
 
     fclose(targetFile);
-
     return 0;
+}
+
+void yyerror(const char* s) {
+    printf("%s\n", s);
 }

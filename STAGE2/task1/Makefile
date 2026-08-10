@@ -10,4 +10,4 @@ lex.yy.c: exprtree.l exprtree.tab.h
 	flex exprtree.l
 
 clean:
-	rm -f exprtree exprtree.tab.c exprtree.tab.h lex.yy.c
+	rm -f exprtree exprtree.tab.c exprtree.tab.h lex.yy.c target.xsm

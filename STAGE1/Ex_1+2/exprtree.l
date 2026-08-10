@@ -1,28 +1,40 @@
 %{
-	#include <stdlib.h>
-	#include <stdio.h>
-	#include "exprtree.h"
-	#include "y.tab.h"
+#include <stdlib.h>
+#include "exprtree.h"
+#include "exprtree.tab.h"
 
-    int yyerror(const char *s);
-	int number;
+void yyerror(const char* s);
 
+int number;
 %}
 
 %%
 
-[0-9]+	{number = atoi(yytext); yylval.no = makeLeafNode(number); return NUM;}
-"+"	{return PLUS;}
-"-"	{return MINUS;}
-"*"	{return MUL;}
-"/"	{return DIV;}
-[ \t]	{}
-[()]	{return *yytext;}
-[\n]	{return END;}
-.	{yyerror("unknown character\n");exit(1);}
+[0-9]+ {    
+    number = atoi(yytext);
+    yylval.node = makeLeafNode(number);
+    return NUM;
+}
+
+"+" { return PLUS; }
+"-" { return MINUS; }
+"*" { return MUL; }
+"/" { return DIV; }
+
+"(" { return '('; }
+")" { return ')'; }
+
+[ \t] { } // for space or tab both we add a trailing space upfront
+[\r] { }
+\n { return END; }
+
+. {
+    yyerror("Unknown character");
+    exit(1);
+}
 
 %%
 
-int yywrap(void) {
-	return 1;
+int yywrap() {
+    return 1;
 }
