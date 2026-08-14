@@ -36,4 +36,6 @@ tnode* makeReadNode(tnode* id);
 tnode* makeWriteNode(tnode* expr);
 tnode* makeConnectorNode(tnode* left, tnode* right);
 
+void printTree(tnode *t);
+
 #endif

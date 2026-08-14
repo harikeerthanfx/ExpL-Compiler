@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "exprtree.h"
-#include "codegen.h"
+#include "eval.h"
 
 int yylex();
 void yyerror(const char* s);
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
     fprintf(targetFile, "MOV SP, 4200\n");
 
     yyparse();
-    codeGen(root);
+    evaluate(root);
 
     fprintf(targetFile, "MOV R2, \"Exit\"\n");
     fprintf(targetFile, "PUSH R2\n");

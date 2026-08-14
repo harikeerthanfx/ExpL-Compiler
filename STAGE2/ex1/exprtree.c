@@ -75,3 +75,38 @@ tnode* makeWriteNode(tnode* expr) {
 tnode* makeConnectorNode(tnode* left, tnode* right) {
     return createTree(0, TYPE_INT, NODE_CONNECTOR, NULL, left, right);
 }
+
+/*
+if wanted to clarify the AST structure, use this funtion "printTree"
+(by simple edit you can change it to post order or pre order traversals)
+
+modified : exprtree.c , exprtree.h and exprtree.y(call happens here)
+*/
+void printTree(tnode *t)
+{
+    if (t == NULL)
+        return;
+
+    switch (t->nodetype)
+    {
+        case NODE_NUM:
+            printf("%d ", t->val);
+            break;
+
+        case NODE_ID:
+            printf("%s ", t->varname);
+            break;
+
+        case NODE_PLUS:      printf("+ "); break;
+        case NODE_MINUS:     printf("- "); break;
+        case NODE_MUL:       printf("* "); break;
+        case NODE_DIV:       printf("/ "); break;
+        case NODE_READ:      printf("READ "); break;
+        case NODE_WRITE:     printf("WRITE "); break;
+        case NODE_ASSIGN:    printf("= "); break;
+        case NODE_CONNECTOR: printf("CONNECTOR "); break;
+    }
+
+    printTree(t->left);
+    printTree(t->right);
+}
