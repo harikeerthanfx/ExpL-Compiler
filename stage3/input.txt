@@ -1,0 +1,8 @@
+begin
+read(a);
+if (a > 10) then
+write(a);
+else
+write(0);
+endif;
+end
