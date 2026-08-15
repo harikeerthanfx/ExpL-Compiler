@@ -1,0 +1,9 @@
+begin
+a = 1;
+
+do
+    write(a);
+    a = a + 1;
+while (a <= 3);
+
+end

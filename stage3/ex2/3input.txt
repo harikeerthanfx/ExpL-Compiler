@@ -1,0 +1,14 @@
+begin
+a = 1;
+
+repeat
+    write(a);
+    a = a + 1;
+until (a == 4);
+
+do
+    write(a);
+    a = a + 1;
+while (a <= 6);
+
+end
