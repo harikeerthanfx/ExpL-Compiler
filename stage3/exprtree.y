@@ -28,11 +28,13 @@ FILE *targetFile;
 %token READ WRITE
 %token IF THEN ELSE ENDIF
 %token WHILE DO ENDWHILE
+%token BREAK CONTINUE
 %token ASSIGN SEMICOLON
 
 %type <node> Program Slist Stmt
 %type <node> InputStmt OutputStmt AsgStmt
 %type <node> IfStmt WhileStmt
+%type <node> BreakStmt ContinueStmt
 %type <node> E
 
 %left EQ NE
@@ -85,6 +87,14 @@ Stmt
     {
         $$ = $1;
     }
+    | BreakStmt
+    {
+        $$ = $1;
+    }
+    | ContinueStmt
+    {
+        $$ = $1;
+    }
     ;
 
 InputStmt
@@ -123,6 +133,20 @@ WhileStmt
     : WHILE '(' E ')' DO Slist ENDWHILE SEMICOLON
     {
         $$ = makeWhileNode($3, $6);
+    }
+    ;
+
+BreakStmt
+    : BREAK SEMICOLON
+    {
+        $$ = makeBreakNode();
+    }
+    ;
+
+ContinueStmt
+    : CONTINUE SEMICOLON
+    {
+        $$ = makeContinueNode();
     }
     ;
 
@@ -208,6 +232,7 @@ int main(int argc, char *argv[])
     if (targetFile == NULL)
     {
         printf("Could not open target.xsm\n");
+        fclose(yyin);
         return 1;
     }
 

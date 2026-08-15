@@ -15,3 +15,27 @@
 - Translate labels to addresses: `./labelTranslator target.xsm target2.xsm`
 - Execute final XSM code: `./xsm -e workdir/stage3/target2.xsm`
 - Clean generated files: `make clean`
+
+### Exercise 2(a) – Largest of a, b, c
+
+- Build: `make`
+- Generate code: `./exprtree largest.txt`
+- Translate labels: `./labelTranslator target.xsm target2.xsm`
+- Execute: `cd ../.. && ./xsm -e workdir/stage3/target2.xsm`
+
+### Exercise 2(b) – Sum until 0
+
+- Build: `make`
+- Generate code: `./exprtree sum.txt`
+- Translate labels: `./labelTranslator target.xsm target2.xsm`
+- Execute: `cd ../.. && ./xsm -e workdir/stage3/target2.xsm`
+
+### Task 4 – Break and Continue
+
+- Build: `make`
+- Generate code: `./exprtree break.txt`
+- Translate labels: `./labelTranslator target.xsm target2.xsm`
+- Execute: `cd ../.. && ./xsm -e workdir/stage3/target2.xsm`
+- Generate code: `./exprtree continue.txt`
+- Translate labels: `./labelTranslator target.xsm target2.xsm`
+- Execute: `cd ../.. && ./xsm -e workdir/stage3/target2.xsm`

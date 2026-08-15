@@ -106,6 +106,18 @@ tnode* makeWhileNode(tnode *cond, tnode *body)
                       cond, NULL, body);
 }
 
+tnode* makeBreakNode(void)
+{
+    return createTree(0, TYPE_INT, NODE_BREAK, NULL,
+                      NULL, NULL, NULL);
+}
+
+tnode* makeContinueNode(void)
+{
+    return createTree(0, TYPE_INT, NODE_CONTINUE, NULL,
+                      NULL, NULL, NULL);
+}
+
 void printTree(tnode *t)
 {
     if (t == NULL)
@@ -134,6 +146,8 @@ void printTree(tnode *t)
         case NODE_CONNECTOR: printf("CONNECTOR "); break;
         case NODE_IF:        printf("IF "); break;
         case NODE_WHILE:     printf("WHILE "); break;
+        case NODE_BREAK:     printf("BREAK "); break;
+        case NODE_CONTINUE:  printf("CONTINUE "); break;
     }
 
     printTree(t->left);

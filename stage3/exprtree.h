@@ -19,7 +19,9 @@ enum {
     NODE_ASSIGN,
     NODE_CONNECTOR,
     NODE_IF,
-    NODE_WHILE
+    NODE_WHILE,
+    NODE_BREAK,
+    NODE_CONTINUE
 };
 
 enum {
@@ -28,10 +30,10 @@ enum {
 };
 
 typedef struct tnode {
-    int type;       // INT or BOOL
-    int val;        // value for NUM nodes
-    char *varname;  // variable name for ID nodes
-    int nodetype;   // node type: +, -, IF, WHILE, etc.
+    int type;
+    int val;
+    char *varname;
+    int nodetype;
 
     struct tnode *left, *middle, *right;
 } tnode;
@@ -50,6 +52,9 @@ tnode* makeConnectorNode(tnode *left, tnode *right);
 tnode* makeRelationalNode(char *op, tnode *l, tnode *r);
 tnode* makeIfNode(tnode *cond, tnode *thenStmt, tnode *elseStmt);
 tnode* makeWhileNode(tnode *cond, tnode *body);
+
+tnode* makeBreakNode(void);
+tnode* makeContinueNode(void);
 
 void printTree(tnode *t);
 
