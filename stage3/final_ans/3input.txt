@@ -1,0 +1,24 @@
+begin
+
+a = 0;
+
+while (a < 3) do
+
+    b = 0;
+
+    while (b < 5) do
+
+        if (b == 2) then
+            break;
+        endif;
+
+        write(b);
+        b = b + 1;
+
+    endwhile;
+
+    a = a + 1;
+
+endwhile;
+
+end;

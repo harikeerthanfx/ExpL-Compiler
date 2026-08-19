@@ -66,12 +66,12 @@ int isLabel(char *line, char *label)
         Make sure the colon occurs immediately after
         the label name, with no spaces.
     */
-    int length = colon - line;
+    int length = colon - line; //length will be 2 (example "L3:")
 
     if (length <= 0 || length >= 20)
         return 0;
 
-    strncpy(label, line, length);
+    strncpy(label, line, length); //destination to copy, source , no. of chars to copy count
     label[length] = '\0';
 
     return 1;
