@@ -1,0 +1,10 @@
+begin
+
+a = 10;
+
+do
+    write(a);
+    a = a + 1;
+while (a <= 5);
+
+end;
