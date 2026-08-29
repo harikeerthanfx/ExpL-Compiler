@@ -1,0 +1,7 @@
+decl
+    str name;
+enddecl
+
+begin
+    name = 5;
+end;

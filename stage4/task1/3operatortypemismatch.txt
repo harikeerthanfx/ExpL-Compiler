@@ -1,0 +1,8 @@
+decl
+    int a;
+    str name;
+enddecl
+
+begin
+    a = name + 5;
+end;

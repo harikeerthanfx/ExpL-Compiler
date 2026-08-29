@@ -137,18 +137,22 @@ tnode* makeOperatorNode(char* op, tnode* l, tnode* r) {
     return createTree(0, type, nodetype, NULL, l, NULL, r);
 }
 
-tnode* makeIdNode(char* name) {
-    return createTree(0, TYPE_INT, NODE_ID, name, NULL, NULL, NULL);
+tnode* makeIdNode(char *name) {
+    struct Gsymbol *entry = Lookup(name);
+
+    if (entry == NULL) {
+        printf("Error: Variable %s not declared\n", name);
+        exit(1);
+    }
+    return createTree(0, entry->type, NODE_ID, name, NULL, NULL, NULL);
 }
 
 tnode* makeAssignNode(tnode* id, tnode* expr) {
-    if (expr->type != TYPE_INT) { // u can only assign an int (a = <bool> is gay)
-        // eg: a = 5 > 3
+    if (id->type != expr->type) {
         fprintf(stderr, "Type mismatch\n");
         exit(1);
     }
-
-    return createTree(0, TYPE_INT, NODE_ASSIGN, NULL, id, NULL, expr);
+    return createTree(0, id->type, NODE_ASSIGN, NULL, id, NULL, expr);
 }
 
 tnode* makeReadNode(tnode* id) {

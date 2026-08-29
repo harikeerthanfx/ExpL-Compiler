@@ -1,5 +1,8 @@
 TASK 1 — HOW TO CHECK
 
+(to check the flags first do make and give them the inouts i have saved using thosenames.txt
+and you can see the flags in the terminal)
+
 1. Put this in input.txt:
 
 decl
