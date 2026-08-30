@@ -21,6 +21,10 @@ void yyerror(const char* s);
 
 "(" { return '('; }
 ")" { return ')'; }
+
+"[" { return '['; } //TASK3 for arrays
+"]" { return ']'; }
+
 "," { return ','; }
  
 "<=" { return LE; } // flex dont rly care about ordering, it checks for longest match first

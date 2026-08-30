@@ -38,7 +38,7 @@ FILE* targetFile;
 %token REPEAT UNTIL DOWHILE
 %token BREAK CONTINUE
 
-%type <node> Program Slist Stmt InputStmt OutputStmt AsgStmt E
+%type <node> Program Slist Stmt InputStmt OutputStmt AsgStmt E Variable //TASK3 new nonterminal Variable added
 %type <node> IfStmt WhileStmt
 %type <node> BreakStmt ContinueStmt
 %type <node> RepeatStmt DoWhileStmt
@@ -63,11 +63,11 @@ DeclList : DeclList Decl
          | Decl
          ;
 
-Decl : Type VarList SEMICOLON { // TASK1: goes through all variable names and installs each one with the declared type
+Decl : Type VarList SEMICOLON { // TASK1: goes through all variable names and installs each one with the declared type (updated for TASK3)
         struct VarList *temp = $2;
 
         while (temp != NULL) {
-            Install(temp->name, $1, 1);
+            Install(temp->name, $1, temp->size);
             temp = temp->next;
         }
      } 
@@ -81,25 +81,48 @@ Type : INT {
      }
      ;
 
-VarList : VarList ',' ID { // TASK1: creates and adds each variable name to the variable list
+//varlist updated for TASK3
+/*
+This supports all of these:
+int a;
+int a[10];
+int a, b[5];
+int a[10], b, c[20];
+*/
+VarList : VarList ',' ID '[' NUM ']' { 
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $3;
+            newVar->size = $5;
             newVar->next = NULL;
 
             struct VarList *temp = $1;
-            while (temp->next != NULL) {
-                temp = temp->next;
-            }
+            while (temp->next != NULL) temp = temp->next;
             temp->next = newVar;
-
             $$ = $1;
         }
+        | VarList ',' ID {
+            struct VarList *newVar = malloc(sizeof(struct VarList));
+            newVar->name = $3;
+            newVar->size = 1;
+            newVar->next = NULL;
 
+            struct VarList *temp = $1;
+            while (temp->next != NULL) temp = temp->next;
+            temp->next = newVar;
+            $$ = $1;
+        }
+        | ID '[' NUM ']' {
+            struct VarList *newVar = malloc(sizeof(struct VarList));
+            newVar->name = $1;
+            newVar->size = $3;
+            newVar->next = NULL;
+            $$ = newVar;
+        }
         | ID {
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $1;
+            newVar->size = 1;
             newVar->next = NULL;
-
             $$ = newVar;
         }
         ;
@@ -146,16 +169,29 @@ Stmt : InputStmt {
         $$ = $1;
     };
 
-InputStmt : READ '(' ID ')' SEMICOLON { // u read into a var, like read(b);
-        $$ = makeReadNode(makeIdNode($3));
+//TASK3: new nonterminal production added
+//n       → makeIdNode("n")
+//arr[i]  → makeArrayNode("arr", AST of i)
+Variable : ID {
+            $$ = makeIdNode($1);
+         }
+         | ID '[' E ']' {
+            $$ = makeArrayNode($1, $3);
+         }
+         ;
+
+//TASK3 changes
+InputStmt : READ '(' Variable ')' SEMICOLON {
+        $$ = makeReadNode($3);
     };
 
 OutputStmt : WRITE '(' E ')' SEMICOLON { // u can write an expression like write(5+8);
         $$ = makeWriteNode($3);
     };
 
-AsgStmt : ID ASSIGN E SEMICOLON {
-        $$ = makeAssignNode(makeIdNode($1), $3);
+//TASK3 changes
+AsgStmt : Variable ASSIGN E SEMICOLON {
+        $$ = makeAssignNode($1, $3);
     };
 
 IfStmt : IF '(' E ')' THEN Slist ELSE Slist ENDIF SEMICOLON {
@@ -222,8 +258,8 @@ E : E PLUS E {
     | NUM {
         $$ = makeNumNode($1);
     }
-    | ID {
-        $$ = makeIdNode($1);
+    | Variable { //TASK3 change here
+        $$ = $1;
     };
 
 %%

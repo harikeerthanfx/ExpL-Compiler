@@ -149,6 +149,31 @@ tnode* makeIdNode(char *name) { //TASK2 : we storing the entry pointer in the Ge
     return node;
 }
 
+// TASK3: creates a NODE_ARRAY for an array access and stores its GST entry and index expression
+tnode* makeArrayNode(char *name, tnode *index) {
+    struct Gsymbol *entry = Lookup(name);
+
+    if (entry == NULL) {
+        printf("Error: Variable %s not declared\n", name);
+        exit(1);
+    }
+
+    if (entry->size == 1) {
+        printf("Error: %s is not an array\n", name);
+        exit(1);
+    }
+
+    if (index->type != TYPE_INT) {
+        printf("Error: Array index must be an integer\n");
+        exit(1);
+    }
+
+    tnode *node = createTree(0, entry->type, NODE_ARRAY, name, index, NULL, NULL);
+    node->Gentry = entry;
+
+    return node;
+}
+
 tnode* makeAssignNode(tnode* id, tnode* expr) {
     if (id->type != expr->type) {
         fprintf(stderr, "Type mismatch\n");

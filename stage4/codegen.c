@@ -46,6 +46,20 @@ void popLoop() {
     if (loopTop >= 0) loopTop--;
 }
 
+int getArrayAddress(tnode *t) { // TASK3: computes and returns the register containing the address of an array element
+
+    int indexReg = codeGen(t->left); // evaluate index expression
+
+    int baseReg = getReg();
+
+    fprintf(targetFile, "MOV R%d, %d\n", baseReg, t->Gentry->binding);
+    fprintf(targetFile, "ADD R%d, R%d\n", indexReg, baseReg);
+
+    freeReg();
+
+    return indexReg;
+}
+
 int codeGen(tnode* t) {
     if (t == NULL)
         return -1;
@@ -62,6 +76,12 @@ int codeGen(tnode* t) {
             int addr = t->Gentry->binding; //TASK2
             fprintf(targetFile, "MOV R%d, [%d]\n", r, addr); // [5000] means fetch value from addr 5000
             return r;
+        }
+        
+        case NODE_ARRAY: { // TASK3: get the value stored at an array element
+            int addrReg = getArrayAddress(t);
+            fprintf(targetFile, "MOV R%d, [R%d]\n", addrReg, addrReg);
+            return addrReg;
         }
 
         // fall through - group all 4 ops together
@@ -133,10 +153,19 @@ int codeGen(tnode* t) {
             return leftReg;
         }
 
-        case NODE_ASSIGN: {
+        case NODE_ASSIGN: { // TASK3: updated to support assignment to array elements
             int r = codeGen(t->right);
-            int addr = t->left->Gentry->binding; //TASK2
-            fprintf(targetFile, "MOV [%d], R%d\n", addr, r); // Overwrite the RAM box (4096 + i) with the VALUE currently sitting in Ri
+
+            if (t->left->nodetype == NODE_ID) {
+                int addr = t->left->Gentry->binding;
+                fprintf(targetFile, "MOV [%d], R%d\n", addr, r);
+            }
+            else if (t->left->nodetype == NODE_ARRAY) { // TASK3: handle arr[i] = value
+                int addrReg = getArrayAddress(t->left);
+                fprintf(targetFile, "MOV [R%d], R%d\n", addrReg, r);
+                freeReg();
+            }
+
             freeReg();
             return -1;
         }
@@ -187,31 +216,42 @@ int codeGen(tnode* t) {
             return -1;
         }
 
-        case NODE_READ: {
-            int addr = t->left->Gentry->binding;
-            
-            // For Read, the ABI contract says:
-            // Arg1 = -1 (-1 = stdin)
-            // Arg2 = Buffer (here buffer means which reg to store the value into)
-            // Arg3 = unused
-            // i.e take value from stdin and store it in buffer
+        case NODE_READ: { // TASK3: updated to support reading into array elements
 
-            fprintf(targetFile, "MOV R2, \"Read\"\n");
-            fprintf(targetFile, "PUSH R2\n");
-            fprintf(targetFile, "MOV R2, -1\n");
-            fprintf(targetFile, "PUSH R2\n");
-            fprintf(targetFile, "MOV R2, %d\n", addr);
-            fprintf(targetFile, "PUSH R2\n");
-            fprintf(targetFile, "PUSH R2\n");
-            fprintf(targetFile, "PUSH R0\n");
-            fprintf(targetFile, "CALL 0\n");
+            if (t->left->nodetype == NODE_ID) {
+                int addr = t->left->Gentry->binding;
 
-            // remove return value + 3 arguments + function code
+                fprintf(targetFile, "MOV R2, \"Read\"\n");
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "MOV R2, -1\n");
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "MOV R2, %d\n", addr);
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "PUSH R0\n");
+                fprintf(targetFile, "CALL 0\n");
+            }
+            else if (t->left->nodetype == NODE_ARRAY) { // TASK3: handle read(arr[i])
+                int addrReg = getArrayAddress(t->left);
+
+                fprintf(targetFile, "MOV R2, \"Read\"\n");
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "MOV R2, -1\n");
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "PUSH R%d\n", addrReg);
+                fprintf(targetFile, "PUSH R2\n");
+                fprintf(targetFile, "PUSH R0\n");
+                fprintf(targetFile, "CALL 0\n");
+
+                freeReg();
+            }
+
             fprintf(targetFile, "POP R0\n");
             fprintf(targetFile, "POP R1\n");
             fprintf(targetFile, "POP R1\n");
             fprintf(targetFile, "POP R1\n");
             fprintf(targetFile, "POP R1\n");
+
             return -1;
         }
 

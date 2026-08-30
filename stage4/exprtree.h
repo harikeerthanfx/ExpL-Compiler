@@ -4,6 +4,7 @@
 enum {
     NODE_NUM,
     NODE_ID,
+    NODE_ARRAY, //TASK3 for accessing array elemets or reading elements
     NODE_PLUS,
     NODE_MINUS,
     NODE_MUL,
@@ -34,6 +35,7 @@ enum {
 
 struct VarList { //Since VarList contains multiple IDs, we need a way to remember all of them before installing them -
     char *name;  // So we’ll create a small linked list for declared variable names.
+    int size; //TASK3 for arrays
     struct VarList *next;
 };
 
@@ -61,6 +63,9 @@ tnode* createTree(int val, int type, int nodetype, char* varname, tnode* l, tnod
 tnode* makeNumNode(int n);
 tnode* makeOperatorNode(char* op, tnode* l, tnode* r);
 tnode* makeIdNode(char* name);
+
+tnode* makeArrayNode(char *name, tnode *index); //TASK3 for accessing or reading array elements(This function will later build: arr[i])
+
 tnode* makeAssignNode(tnode* id, tnode* expr);
 tnode* makeReadNode(tnode* id);
 tnode* makeWriteNode(tnode* expr);
