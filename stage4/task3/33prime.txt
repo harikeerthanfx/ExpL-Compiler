@@ -1,0 +1,12 @@
+
+This one won’t work yet with your current compiler for two reasons:
+
+% operator is not implemented.
+≤ must be written as <=.
+
+Also, your program uses:
+
+write("Prime");
+write("Not Prime");
+
+Your current lexer/grammar also does not yet support string literals like "Prime" as expressions.

@@ -60,25 +60,6 @@ int getArrayAddress(tnode *t) { // TASK3: computes and returns the register cont
     return indexReg;
 }
 
-int getArray2DAddress(tnode *t) { // EX1: computes address of a 2D array element
-	int rowReg = codeGen(t->left);
-	int colReg = codeGen(t->middle);
-	int baseReg = getReg();
-	int colsReg = getReg();
-
-	fprintf(targetFile, "MOV R%d, %d\n", baseReg, t->Gentry->binding);
-	fprintf(targetFile, "MOV R%d, %d\n", colsReg, t->Gentry->cols);
-	fprintf(targetFile, "MUL R%d, R%d\n", rowReg, colsReg);
-	fprintf(targetFile, "ADD R%d, R%d\n", rowReg, colReg);
-	fprintf(targetFile, "ADD R%d, R%d\n", rowReg, baseReg);
-
-	freeReg();
-	freeReg();
-	freeReg();
-
-	return rowReg;
-}
-
 int codeGen(tnode* t) {
     if (t == NULL)
         return -1;
@@ -99,12 +80,6 @@ int codeGen(tnode* t) {
         
         case NODE_ARRAY: { // TASK3: get the value stored at an array element
             int addrReg = getArrayAddress(t);
-            fprintf(targetFile, "MOV R%d, [R%d]\n", addrReg, addrReg);
-            return addrReg;
-        }
-
-        case NODE_ARRAY2D: { // EX1: get value stored at a 2D array element
-            int addrReg = getArray2DAddress(t);
             fprintf(targetFile, "MOV R%d, [R%d]\n", addrReg, addrReg);
             return addrReg;
         }
@@ -190,11 +165,6 @@ int codeGen(tnode* t) {
                 fprintf(targetFile, "MOV [R%d], R%d\n", addrReg, r);
                 freeReg();
             }
-            else if (t->left->nodetype == NODE_ARRAY2D) { // EX1: handle arr[i][j] = value
-                int addrReg = getArray2DAddress(t->left);
-                fprintf(targetFile, "MOV [R%d], R%d\n", addrReg, r);
-                freeReg();
-            }
 
             freeReg();
             return -1;
@@ -246,7 +216,8 @@ int codeGen(tnode* t) {
             return -1;
         }
 
-        case NODE_READ: { // TASK3 + EX1: supports reading into variables and array elements
+        case NODE_READ: { // TASK3: updated to support reading into array elements
+
             if (t->left->nodetype == NODE_ID) {
                 int addr = t->left->Gentry->binding;
 
@@ -262,20 +233,6 @@ int codeGen(tnode* t) {
             }
             else if (t->left->nodetype == NODE_ARRAY) { // TASK3: handle read(arr[i])
                 int addrReg = getArrayAddress(t->left);
-
-                fprintf(targetFile, "MOV R2, \"Read\"\n");
-                fprintf(targetFile, "PUSH R2\n");
-                fprintf(targetFile, "MOV R2, -1\n");
-                fprintf(targetFile, "PUSH R2\n");
-                fprintf(targetFile, "PUSH R%d\n", addrReg);
-                fprintf(targetFile, "PUSH R2\n");
-                fprintf(targetFile, "PUSH R0\n");
-                fprintf(targetFile, "CALL 0\n");
-
-                freeReg();
-            }
-            else if (t->left->nodetype == NODE_ARRAY2D) { // EX1: handle read(arr[i][j])
-                int addrReg = getArray2DAddress(t->left);
 
                 fprintf(targetFile, "MOV R2, \"Read\"\n");
                 fprintf(targetFile, "PUSH R2\n");

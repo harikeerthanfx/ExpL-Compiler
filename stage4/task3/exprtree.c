@@ -17,33 +17,33 @@ struct Gsymbol *Lookup(char *name) { //for TASK1 (Lookup() searches the symbol t
     }
     return NULL;
 }
-//for TASK1 (creates a new symbol-table entry and adds it to the linked list)
-void Install(char *name, int type, int size, int rows, int cols) { // EX1: installs variable with its dimensions in the GST
-	if (Lookup(name) != NULL) {
-		printf("Error: Variable %s already declared\n", name);
-		exit(1);
-	}
 
-	struct Gsymbol *newEntry = (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
+void Install(char *name, int type, int size) { //for TASK1 (creates a new symbol-table entry and adds it to the linked list)
+    if (Lookup(name) != NULL) {
+        printf("Error: Variable %s already declared\n", name);
+        exit(1);
+    }
 
-	newEntry->name = strdup(name);
-	newEntry->type = type;
-	newEntry->size = size;
-	newEntry->rows = rows;
-	newEntry->cols = cols;
-	newEntry->binding = nextBinding;
+    struct Gsymbol *newEntry = (struct Gsymbol *)malloc(sizeof(struct Gsymbol));
 
-	nextBinding = nextBinding + size;
-	newEntry->next = NULL;
+    newEntry->name = strdup(name);
+    newEntry->type = type;
+    newEntry->size = size;
+    newEntry->binding = nextBinding;
+    nextBinding = nextBinding + size;
+    newEntry->next = NULL;
 
-	if (Ghead == NULL) {
-		Ghead = newEntry;
-	}
-	else {
-		struct Gsymbol *temp = Ghead;
-		while (temp->next != NULL) temp = temp->next;
-		temp->next = newEntry;
-	}
+    if (Ghead == NULL) {
+        Ghead = newEntry;
+    }
+    else {
+        struct Gsymbol *temp = Ghead;
+
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newEntry;
+    }
 }
 
 void PrintSymbolTable() { // TASK1: prints the symbol table to check whether variables were installed correctly
@@ -172,31 +172,6 @@ tnode* makeArrayNode(char *name, tnode *index) {
     node->Gentry = entry;
 
     return node;
-}
-
-// EX1: creates a NODE_ARRAY2D for a 2D array access like a[i][j]
-tnode* makeArray2DNode(char *name, tnode *rowIndex, tnode *colIndex) {
-	struct Gsymbol *entry = Lookup(name);
-
-	if (entry == NULL) {
-		printf("Error: Variable %s not declared\n", name);
-		exit(1);
-	}
-
-	if (entry->rows == 1 || entry->cols == 1) {
-		printf("Error: %s is not a 2D array\n", name);
-		exit(1);
-	}
-
-	if (rowIndex->type != TYPE_INT || colIndex->type != TYPE_INT) {
-		printf("Error: Array indices must be integers\n");
-		exit(1);
-	}
-
-	tnode *node = createTree(0, entry->type, NODE_ARRAY2D, name, rowIndex, colIndex, NULL);
-	node->Gentry = entry;
-
-	return node;
 }
 
 tnode* makeAssignNode(tnode* id, tnode* expr) {

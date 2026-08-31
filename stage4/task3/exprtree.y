@@ -62,12 +62,12 @@ Declarations : DECL DeclList ENDDECL
 DeclList : DeclList Decl
          | Decl
          ;
-// TASK1: goes through all variable names and installs each one with the declared type (updated for TASK3)
-Decl : Type VarList SEMICOLON { 
+
+Decl : Type VarList SEMICOLON { // TASK1: goes through all variable names and installs each one with the declared type (updated for TASK3)
         struct VarList *temp = $2;
 
         while (temp != NULL) {
-            Install(temp->name, $1, temp->size, temp->rows, temp->cols); // EX1: passes array dimensions to the GST
+            Install(temp->name, $1, temp->size);
             temp = temp->next;
         }
      } 
@@ -89,24 +89,9 @@ int a[10];
 int a, b[5];
 int a[10], b, c[20];
 */
-VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to support 2D arrays by storing rows, columns, and total allocated size
+VarList : VarList ',' ID '[' NUM ']' { 
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $3;
-            newVar->rows = $5;
-            newVar->cols = $8;
-            newVar->size = $5 * $8;
-            newVar->next = NULL;
-
-            struct VarList *temp = $1;
-            while (temp->next != NULL) temp = temp->next;
-            temp->next = newVar;
-            $$ = $1;
-        }
-        | VarList ',' ID '[' NUM ']' { 
-            struct VarList *newVar = malloc(sizeof(struct VarList));
-            newVar->name = $3;
-            newVar->rows = 1;
-            newVar->cols = $5;
             newVar->size = $5;
             newVar->next = NULL;
 
@@ -118,8 +103,6 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
         | VarList ',' ID {
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $3;
-            newVar->rows = 1;
-            newVar->cols = 1;
             newVar->size = 1;
             newVar->next = NULL;
 
@@ -128,20 +111,9 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
             temp->next = newVar;
             $$ = $1;
         }
-        | ID '[' NUM ']' '[' NUM ']' {  // EX1: VarList updated to support 2D arrays by storing rows, columns, and total allocated size
-            struct VarList *newVar = malloc(sizeof(struct VarList));
-            newVar->name = $1;
-            newVar->rows = $3;
-            newVar->cols = $6;
-            newVar->size = $3 * $6;
-            newVar->next = NULL;
-            $$ = newVar;
-        }
         | ID '[' NUM ']' {
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $1;
-            newVar->rows = 1;
-            newVar->cols = $3;
             newVar->size = $3;
             newVar->next = NULL;
             $$ = newVar;
@@ -149,8 +121,6 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
         | ID {
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $1;
-            newVar->rows = 1;
-            newVar->cols = 1;
             newVar->size = 1;
             newVar->next = NULL;
             $$ = newVar;
@@ -204,14 +174,11 @@ Stmt : InputStmt {
 //arr[i]  → makeArrayNode("arr", AST of i)
 Variable : ID {
             $$ = makeIdNode($1);
-        }
-        | ID '[' E ']' {
+         }
+         | ID '[' E ']' {
             $$ = makeArrayNode($1, $3);
-        }
-        | ID '[' E ']' '[' E ']' { // EX1: supports 2D array access like a[i][j]
-            $$ = makeArray2DNode($1, $3, $6);
-        }
-        ;
+         }
+         ;
 
 //TASK3 changes
 InputStmt : READ '(' Variable ')' SEMICOLON {

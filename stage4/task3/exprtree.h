@@ -5,7 +5,6 @@ enum { //its main fucntion is when we generate codegen (that switch case) and ot
     NODE_NUM,
     NODE_ID,
     NODE_ARRAY, //TASK3 for accessing array elemets or reading elements
-    NODE_ARRAY2D, //EX1
     NODE_PLUS,
     NODE_MINUS,
     NODE_MUL,
@@ -37,8 +36,6 @@ enum {
 struct VarList { //Since VarList contains multiple IDs, we need a way to remember all of them before installing them -
     char *name;  // So we’ll create a small linked list for declared variable names.
     int size; //TASK3 for arrays
-    int rows; // EX1: number of rows for 2D array
-    int cols; // EX1: number of columns for 2D array
     struct VarList *next;
 };
 
@@ -46,8 +43,6 @@ struct Gsymbol { //for TASK1 (This represents one entry in the symbol table.)
     char *name;
     int type;
     int size;
-	int rows; // EX1: number of rows
-	int cols; // EX1: number of columns
     int binding;
     struct Gsymbol *next;
 };
@@ -70,7 +65,6 @@ tnode* makeOperatorNode(char* op, tnode* l, tnode* r);
 tnode* makeIdNode(char* name);
 
 tnode* makeArrayNode(char *name, tnode *index); //TASK3 for accessing or reading array elements(This function will later build: arr[i])
-tnode* makeArray2DNode(char *name, tnode *rowIndex, tnode *colIndex); // EX1: creates AST node for 2D array access
 
 tnode* makeAssignNode(tnode* id, tnode* expr);
 tnode* makeReadNode(tnode* id);
@@ -87,7 +81,7 @@ tnode* makeRepeatNode(tnode* body, tnode* cond);
 tnode* makeDoWhileNode(tnode* body, tnode* cond);
 
 struct Gsymbol *Lookup(char *name); //for TASK1  (Search for a variable in the symbol table.)
-void Install(char *name, int type, int size, int rows, int cols); // EX1: installs variable with 2D dimension information //for TASK1 (Add a new variable to the symbol table.)
+void Install(char *name, int type, int size); //for TASK1 (Add a new variable to the symbol table.)
 void PrintSymbolTable(); //for TASK1 (This is mainly for Task 1 verification.)
 
 #endif
