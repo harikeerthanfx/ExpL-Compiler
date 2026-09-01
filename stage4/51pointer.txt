@@ -1,0 +1,9 @@
+decl
+    int x, *p;
+enddecl
+begin
+    x = 25;
+    p = &x;
+    *p = 50;
+    write(*p);
+end;

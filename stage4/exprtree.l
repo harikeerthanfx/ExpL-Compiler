@@ -19,6 +19,8 @@ void yyerror(const char* s);
 "*" { return MUL; }
 "/" { return DIV; }
 
+"&" { return ADDRESS; } // EX2: recognizes the address-of operator
+
 "(" { return '('; }
 ")" { return ')'; }
 

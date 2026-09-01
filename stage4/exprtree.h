@@ -7,6 +7,8 @@ enum { //its main fucntion is when we generate codegen (that switch case) and ot
     NODE_STR, //TASK1 forgotten croassroads(iykyk)
 
     NODE_ID,
+    NODE_ADDRESS, // EX2: represents the address-of operator
+    NODE_DEREFERENCE, // EX2: represents dereferencing a pointer
     NODE_ARRAY, //TASK3 for accessing array elemets or reading elements
     NODE_ARRAY2D, //EX1
     NODE_PLUS,
@@ -34,7 +36,9 @@ enum { //its main fucntion is when we generate codegen (that switch case) and ot
 enum {
     TYPE_INT,
     TYPE_BOOL,
-    TYPE_STR //for TASK1
+    TYPE_STR,
+    TYPE_INT_PTR,   // EX2: pointer to int
+    TYPE_STR_PTR    // EX2: pointer to string
 };
 
 struct VarList { //Since VarList contains multiple IDs, we need a way to remember all of them before installing them -
@@ -42,6 +46,7 @@ struct VarList { //Since VarList contains multiple IDs, we need a way to remembe
     int size; //TASK3 for arrays
     int rows; // EX1: number of rows for 2D array
     int cols; // EX1: number of columns for 2D array
+    int isPointer; // EX2: 1 if variable is a pointer, 0 otherwise
     struct VarList *next;
 };
 
@@ -77,6 +82,9 @@ tnode* makeIdNode(char* name);
 
 tnode* makeArrayNode(char *name, tnode *index); //TASK3 for accessing or reading array elements(This function will later build: arr[i])
 tnode* makeArray2DNode(char *name, tnode *rowIndex, tnode *colIndex); // EX1: creates AST node for 2D array access
+
+tnode* makeAddressNode(tnode *var); // EX2: creates an AST node for the address-of operator
+tnode* makeDereferenceNode(tnode *ptr); // EX2: creates an AST node for dereferencing a pointer
 
 tnode* makeAssignNode(tnode* id, tnode* expr);
 tnode* makeReadNode(tnode* id);

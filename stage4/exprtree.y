@@ -25,6 +25,9 @@ FILE* targetFile;
 %token <str> STRING //TASK1 forgotten croassroads(iykyk)
 
 %token PLUS MINUS MUL DIV
+
+%token ADDRESS // EX2: token for the address-of operator
+
 %token LT GT LE GE EQ NE
 
 %token T_BEGIN T_END 
@@ -64,16 +67,23 @@ Declarations : DECL DeclList ENDDECL
 DeclList : DeclList Decl
          | Decl
          ;
-// TASK1: goes through all variable names and installs each one with the declared type (updated for TASK3)
-Decl : Type VarList SEMICOLON { 
-        struct VarList *temp = $2;
 
+// TASK1: goes through all variable names and installs each one with the declared type (updated for TASK3)
+Decl : Type VarList SEMICOLON {  //EX2
+        struct VarList *temp = $2;
         while (temp != NULL) {
-            Install(temp->name, $1, temp->size, temp->rows, temp->cols); // EX1: passes array dimensions to the GST
+            int varType = $1;
+            if (temp->isPointer) {
+                if ($1 == TYPE_INT)
+                    varType = TYPE_INT_PTR;
+                else if ($1 == TYPE_STR)
+                    varType = TYPE_STR_PTR;
+            }
+            Install(temp->name, varType, temp->size, temp->rows, temp->cols); // EX1: passes array dimensions to the GST
             temp = temp->next;
         }
-     } 
-     ;
+    }
+    ;
 
 Type : INT {
         $$ = TYPE_INT;
@@ -133,6 +143,7 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
         | ID '[' NUM ']' '[' NUM ']' {  // EX1: VarList updated to support 2D arrays by storing rows, columns, and total allocated size
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $1;
+            newVar->isPointer = 0; // EX2: marks this as a normal variable, not a pointer
             newVar->rows = $3;
             newVar->cols = $6;
             newVar->size = $3 * $6;
@@ -142,6 +153,7 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
         | ID '[' NUM ']' {
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $1;
+            newVar->isPointer = 0; // EX2: marks this as a normal variable, not a pointer
             newVar->rows = 1;
             newVar->cols = $3;
             newVar->size = $3;
@@ -151,13 +163,36 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
         | ID {
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $1;
+            newVar->isPointer = 0; // EX2: marks this as a normal variable, not a pointer
             newVar->rows = 1;
             newVar->cols = 1;
             newVar->size = 1;
             newVar->next = NULL;
             $$ = newVar;
         }
-        ;
+        | VarList ',' MUL ID { // EX2: adds a pointer variable to the declaration list
+            struct VarList *newVar = malloc(sizeof(struct VarList));
+            newVar->name = $4;
+            newVar->isPointer = 1;
+            newVar->rows = 1;
+            newVar->cols = 1;
+            newVar->size = 1;
+            newVar->next = NULL;
+            struct VarList *temp = $1;
+            while (temp->next != NULL) temp = temp->next;
+            temp->next = newVar;
+            $$ = $1;
+        }
+        | MUL ID { // EX2: creates the first pointer variable in the declaration list
+            struct VarList *newVar = malloc(sizeof(struct VarList));
+            newVar->name = $2;
+            newVar->isPointer = 1;
+            newVar->rows = 1;
+            newVar->cols = 1;
+            newVar->size = 1;
+            newVar->next = NULL;
+            $$ = newVar;
+        };
 
 Program : Declarations T_BEGIN Slist T_END SEMICOLON {
             root = $3;
@@ -207,11 +242,17 @@ Stmt : InputStmt {
 Variable : ID {
             $$ = makeIdNode($1);
         }
+
         | ID '[' E ']' {
             $$ = makeArrayNode($1, $3);
         }
+
         | ID '[' E ']' '[' E ']' { // EX1: supports 2D array access like a[i][j]
             $$ = makeArray2DNode($1, $3, $6);
+        }
+
+        | MUL Variable { // EX2: allows a dereferenced pointer as an assignment target
+            $$ = makeDereferenceNode($2);
         }
         ;
 
@@ -295,6 +336,9 @@ E : E PLUS E {
     }
     | STRING { //TASK1 forgotten crossroads(iykyk)
         $$ = makeStrNode($1);
+    }
+    | ADDRESS Variable { // EX2: address-of operator returns the address of a variable
+        $$ = makeAddressNode($2);
     }
     | Variable { //TASK3 change here
         $$ = $1;
