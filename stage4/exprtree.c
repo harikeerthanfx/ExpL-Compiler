@@ -79,6 +79,10 @@ tnode* makeNumNode(int n) {
     return createTree(n, TYPE_INT, NODE_NUM, NULL, NULL, NULL, NULL);
 }
 
+tnode* makeStrNode(char *s) { //TASK1 forgotten crossroads(iykyk)
+    return createTree(0, TYPE_STR, NODE_STR, s, NULL, NULL, NULL);
+}
+
 tnode* makeOperatorNode(char* op, tnode* l, tnode* r) {
     int nodetype;
     int type;

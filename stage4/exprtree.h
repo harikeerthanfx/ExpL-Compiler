@@ -3,6 +3,9 @@
 
 enum { //its main fucntion is when we generate codegen (that switch case) and other function is When creating AST nodes
     NODE_NUM,
+    
+    NODE_STR, //TASK1 forgotten croassroads(iykyk)
+
     NODE_ID,
     NODE_ARRAY, //TASK3 for accessing array elemets or reading elements
     NODE_ARRAY2D, //EX1
@@ -66,6 +69,9 @@ typedef struct tnode {
 tnode* createTree(int val, int type, int nodetype, char* varname, tnode* l, tnode* m, tnode* r);
 
 tnode* makeNumNode(int n);
+
+tnode* makeStrNode(char *s); //TASK1 forgotten crossroads(iykyk)
+
 tnode* makeOperatorNode(char* op, tnode* l, tnode* r);
 tnode* makeIdNode(char* name);
 

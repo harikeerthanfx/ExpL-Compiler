@@ -22,6 +22,8 @@ FILE* targetFile;
 %token <num> NUM 
 %token <str> ID
 
+%token <str> STRING //TASK1 forgotten croassroads(iykyk)
+
 %token PLUS MINUS MUL DIV
 %token LT GT LE GE EQ NE
 
@@ -290,6 +292,9 @@ E : E PLUS E {
     }
     | NUM {
         $$ = makeNumNode($1);
+    }
+    | STRING { //TASK1 forgotten crossroads(iykyk)
+        $$ = makeStrNode($1);
     }
     | Variable { //TASK3 change here
         $$ = $1;

@@ -22,3 +22,16 @@ To test both together:
 ./labelTranslator target.xsm target2.xsm
 ./xsm -e target2.xsm
 ```
+
+for 22forgotten.txt
+input:
+10
+20
+30
+0
+
+output
+sum is:
+60
+good bye
+Machine is halting.

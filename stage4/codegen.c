@@ -89,6 +89,12 @@ int codeGen(tnode* t) {
             fprintf(targetFile, "MOV R%d, %d\n", r, t->val);
             return r;
         }
+
+        case NODE_STR: { //TASK1 forgotten crossroads(iykyk)
+            int r = getReg();
+            fprintf(targetFile, "MOV R%d, \"%s\"\n", r, t->varname);
+            return r;
+        }
         
         case NODE_ID: { // whenever stuff like d = a * 3 + b comes -> so we fetch values of them and stores it in reg
             int r = getReg();

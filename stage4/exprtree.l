@@ -67,6 +67,12 @@ void yyerror(const char* s);
 "=" { return ASSIGN; }
 ";" { return SEMICOLON; }
 
+\"[^\"]*\" { //TASK1 forgotten crossroads(iykyk)
+    yytext[yyleng - 1] = '\0';
+    yylval.str = strdup(yytext + 1);
+    return STRING;
+}
+
 [a-zA-Z][a-zA-Z0-9]* {
     yylval.str = strdup(yytext);
     return ID;

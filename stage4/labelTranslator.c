@@ -39,24 +39,34 @@ int findLabelAddress(char* name) {
     printf("Error: label %s not found\n", name);
     exit(1);
 }
-
-// check if its a label
-// normal instructions do not contain colon
-int isLabel(char* line, char* label) {
-    char* colon = strchr(line, ':'); // strchr finds the first pos a letter comes in a word
+// TASK1: forgotten crossroads (iykyk)
+//  Check that ':' belongs to a valid label name.
+// Previously, any ':' was treated as a label, so a string like
+// "sum is:" was incorrectly detected as a label and removed.
+// Now we ensure the part before ':' contains only valid label characters.
+int isLabel(char *line, char *label) {
+    char *colon = strchr(line, ':');
 
     if (colon == NULL)
         return 0;
 
-    // Make sure the colon occurs immediately after the label name, with no spaces
     int length = colon - line;
 
-    // if no chars before colon, no label name
-    // since char label is of size 20, we cant write past
-    if (length <= 0 || length >= 20) return 0;
+    if (length <= 0 || length >= 20)
+        return 0;
+
+    // Label must contain only letters/digits/underscore
+    for (int i = 0; i < length; i++) {
+        if (!(line[i] >= 'A' && line[i] <= 'Z') &&
+            !(line[i] >= 'a' && line[i] <= 'z') &&
+            !(line[i] >= '0' && line[i] <= '9') &&
+            line[i] != '_')
+            return 0;
+    }
 
     strncpy(label, line, length);
     label[length] = '\0';
+
     return 1;
 }
 
