@@ -1,0 +1,21 @@
+decl
+    int i, j, arr[5], sum;
+enddecl
+
+begin
+    i = 0;
+    j = 0;
+    sum = 0;
+
+    while (i<5) do
+        arr[i] = 4;
+        i = i + 1;
+    endwhile;
+
+    while (j<5) do
+        sum = sum + arr[j];
+        j = j + 1;
+    endwhile;
+
+    write(sum);    
+end;

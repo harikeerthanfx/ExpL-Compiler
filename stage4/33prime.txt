@@ -1,12 +1,24 @@
+decl
+    int n,i,j;
+enddecl
 
-This one won’t work yet with your current compiler for two reasons:
-
-% operator is not implemented.
-≤ must be written as <=.
-
-Also, your program uses:
-
-write("Prime");
-write("Not Prime");
-
-Your current lexer/grammar also does not yet support string literals like "Prime" as expressions.
+begin
+    read(n);
+    j=0;
+    if(n%2==0) then
+        j=1;
+    else
+        i=3;
+        while(i<=n/2) do
+            if(n%i==0) then
+                j=1;
+            endif;
+            i=i+2;
+        endwhile;
+    endif;
+    if(j==0) then
+        write("Prime");
+    else
+        write("Not Prime");
+    endif;
+end;

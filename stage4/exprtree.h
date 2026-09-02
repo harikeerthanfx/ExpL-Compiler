@@ -15,6 +15,7 @@ enum { //its main fucntion is when we generate codegen (that switch case) and ot
     NODE_MINUS,
     NODE_MUL,
     NODE_DIV,
+    NODE_MOD, // EX2: modulo operator
     NODE_READ,
     NODE_WRITE,
     NODE_ASSIGN,

@@ -24,7 +24,7 @@ FILE* targetFile;
 
 %token <str> STRING //TASK1 forgotten croassroads(iykyk)
 
-%token PLUS MINUS MUL DIV
+%token PLUS MINUS MUL DIV MOD //EX2 change for mod
 
 %token ADDRESS // EX2: token for the address-of operator
 
@@ -54,7 +54,7 @@ FILE* targetFile;
 %left EQ NE 
 %left LT GT LE GE 
 %left PLUS MINUS
-%left MUL DIV
+%left MUL DIV MOD
 
 %start Program
 
@@ -309,6 +309,9 @@ E : E PLUS E {
     }
     | E DIV E {
         $$ = makeOperatorNode("/", $1, $3);
+    }
+    | E MOD E {
+        $$ = makeOperatorNode("%", $1, $3); // EX2: creates the modulo operation node               
     }
     | '(' E ')' {
         $$ = $2;

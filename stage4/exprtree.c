@@ -142,6 +142,10 @@ tnode* makeOperatorNode(char* op, tnode* l, tnode* r) {
         nodetype = NODE_DIV;
         type = TYPE_INT;
     }
+    else if (strcmp(op, "%") == 0){
+        nodetype = NODE_MOD; // EX2: identifies the modulo operation
+        type = TYPE_INT; // EX2: modulo produces an integer
+    }
     else if (strcmp(op, "<") == 0) {
         nodetype = NODE_LT;
         type = TYPE_BOOL;

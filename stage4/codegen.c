@@ -128,15 +128,19 @@ int codeGen(tnode* t) {
             return addrReg;
         }
 
-        // fall through - group all 4 ops together
+        // fall through - group all 5 ops together
+
         case NODE_PLUS:
         case NODE_MINUS:
         case NODE_MUL:
-        case NODE_DIV: { 
+        case NODE_DIV:
+        case NODE_MOD: { // EX2: includes modulo operation
+
             int leftReg = codeGen(t->left);
             int rightReg = codeGen(t->right);
 
             switch (t->nodetype) {
+
                 case NODE_PLUS:
                     fprintf(targetFile, "ADD R%d, R%d\n", leftReg, rightReg);
                     break;
@@ -151,6 +155,10 @@ int codeGen(tnode* t) {
 
                 case NODE_DIV:
                     fprintf(targetFile, "DIV R%d, R%d\n", leftReg, rightReg);
+                    break;
+
+                case NODE_MOD:
+                    fprintf(targetFile, "MOD R%d, R%d\n", leftReg, rightReg); // EX2: generates modulo instruction
                     break;
             }
 

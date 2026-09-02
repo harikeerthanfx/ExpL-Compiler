@@ -1,0 +1,7 @@
+decl
+    int a[5];
+enddecl
+
+begin
+    a["hello"] = 5;
+end;
