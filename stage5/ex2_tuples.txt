@@ -1,0 +1,20 @@
+decl
+    tuple student(str name, int rollno, int year) a, b;
+enddecl
+
+int main(){
+decl
+    int local;
+enddecl
+begin
+    a.name = "Ada";
+    a.rollno = 17;
+    a.year = 2026;
+    b = a;
+    b = a;
+    write(b.name);
+    write(b.rollno);
+    read(b.year);
+return 0;
+end
+}

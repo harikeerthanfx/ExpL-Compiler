@@ -1,0 +1,8 @@
+decl
+    int result;
+    int result(int n);
+enddecl
+
+begin
+    write(result);
+end;

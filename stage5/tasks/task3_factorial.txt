@@ -1,0 +1,28 @@
+decl
+    int answer;
+    int factorial(int n);
+enddecl
+
+int factorial(int n){
+decl
+    int result;
+enddecl
+begin
+    if(n == 0 || n == 1) then
+        result = 1;
+    else
+        result = n * factorial(n - 1);
+    endif;
+return result;
+end
+}
+
+int main(){
+decl
+enddecl
+begin
+    answer = factorial(5);
+    write(answer);
+return 0;
+end
+}
