@@ -1,0 +1,14 @@
+decl
+    tuple point (int x, int y) a, b;
+enddecl
+
+int main() {
+begin
+    a.x = 3;
+    a.y = 4;
+    b = a;
+    write(b.x);
+    write(b.y);
+    return 0;
+end
+}

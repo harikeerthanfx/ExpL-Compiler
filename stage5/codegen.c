@@ -50,9 +50,21 @@ void popLoop() {
 /* Materialize the address of an identifier.  Global variables have a static
  * address; local variables and parameters live at BP + their LST binding. */
 static void emitIdAddress(tnode *id, int addressReg) {
+    if (id->nodetype == NODE_DEREFERENCE) {
+        /* A dereference denotes the object at the pointer value, so its
+         * address is the pointer expression itself. */
+        int pointerReg = codeGen(id->left);
+        fprintf(targetFile, "MOV R%d, R%d\n", addressReg, pointerReg);
+        if (pointerReg != addressReg) freeReg();
+        return;
+    }
     if (id->nodetype == NODE_FIELD) {
         emitIdAddress(id->left, addressReg);
-        fprintf(targetFile, "ADD R%d, %d\n", addressReg, id->field->offset);
+        if (id->left->nodetype == NODE_ID && id->left->Lentry != NULL &&
+            id->left->type == TYPE_TUPLE && id->left->Lentry->binding < 0)
+            fprintf(targetFile, "SUB R%d, %d\n", addressReg, id->field->offset);
+        else
+            fprintf(targetFile, "ADD R%d, %d\n", addressReg, id->field->offset);
         return;
     }
     if (id->Lentry != NULL) {
@@ -61,6 +73,11 @@ static void emitIdAddress(tnode *id, int addressReg) {
     } else {
         fprintf(targetFile, "MOV R%d, %d\n", addressReg, id->Gentry->binding);
     }
+}
+
+static int isTupleValueParameter(tnode *value) {
+    return value->nodetype == NODE_ID && value->Lentry != NULL &&
+           value->type == TYPE_TUPLE && value->Lentry->binding < 0;
 }
 
 static int getIdAddress(tnode *id) {
@@ -73,12 +90,14 @@ static void emitTupleCopy(tnode *destination, tnode *source) {
     int destinationReg = getIdAddress(destination);
     int sourceReg = getIdAddress(source);
     int valueReg = getReg();
+    int destinationStep = isTupleValueParameter(destination) ? -1 : 1;
+    int sourceStep = isTupleValueParameter(source) ? -1 : 1;
     for (int i = 0; i < destination->tupleType->size; i++) {
         fprintf(targetFile, "MOV R%d, [R%d]\n", valueReg, sourceReg);
         fprintf(targetFile, "MOV [R%d], R%d\n", destinationReg, valueReg);
         if (i + 1 < destination->tupleType->size) {
-            fprintf(targetFile, "INR R%d\n", destinationReg);
-            fprintf(targetFile, "INR R%d\n", sourceReg);
+            fprintf(targetFile, "%s R%d\n", destinationStep > 0 ? "INR" : "DCR", destinationReg);
+            fprintf(targetFile, "%s R%d\n", sourceStep > 0 ? "INR" : "DCR", sourceReg);
         }
     }
     freeReg();
@@ -97,11 +116,33 @@ static int generateFunctionCall(tnode *call) {
     struct ArgList *arg = call->arglist;
     for (int i = 0; i < count; i++, arg = arg->next) args[i] = arg;
 
-    /* Push right-to-left: arg_1 finally appears at BP-3 in the callee. */
+    /* Push right-to-left.  Tuple values are copied onto the stack from their
+     * final word toward their first so word zero sits at the formal binding. */
     for (int i = count - 1; i >= 0; i--) {
-        int valueReg = codeGen(args[i]->expr);
-        fprintf(targetFile, "PUSH R%d\n", valueReg);
-        freeReg();
+        tnode *value = args[i]->expr;
+        if (value->type == TYPE_TUPLE) {
+            int addressReg = getIdAddress(value);
+            int valueReg = getReg();
+            for (int offset = value->tupleType->size - 1; offset >= 0; offset--) {
+                int slotReg = getReg();
+                fprintf(targetFile, "MOV R%d, R%d\n", slotReg, addressReg);
+                if (offset != 0) {
+                    if (isTupleValueParameter(value))
+                        fprintf(targetFile, "SUB R%d, %d\n", slotReg, offset);
+                    else
+                        fprintf(targetFile, "ADD R%d, %d\n", slotReg, offset);
+                }
+                fprintf(targetFile, "MOV R%d, [R%d]\n", valueReg, slotReg);
+                fprintf(targetFile, "PUSH R%d\n", valueReg);
+                freeReg();
+            }
+            freeReg();
+            freeReg();
+        } else {
+            int valueReg = codeGen(value);
+            fprintf(targetFile, "PUSH R%d\n", valueReg);
+            freeReg();
+        }
     }
     free(args);
 
@@ -111,7 +152,10 @@ static int generateFunctionCall(tnode *call) {
     int resultReg = getReg();
     fprintf(targetFile, "POP R%d\n", resultReg);
     int discardReg = resultReg == 19 ? 0 : 19;
-    for (int i = 0; i < count; i++) fprintf(targetFile, "POP R%d\n", discardReg);
+    int argumentWords = 0;
+    for (struct Paramstruct *param = call->Gentry->paramlist; param != NULL; param = param->next)
+        argumentWords += param->size;
+    for (int i = 0; i < argumentWords; i++) fprintf(targetFile, "POP R%d\n", discardReg);
     for (int i = savedTop; i >= 0; i--) fprintf(targetFile, "POP R%d\n", i);
     return resultReg;
 }

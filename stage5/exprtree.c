@@ -69,7 +69,10 @@ static void clearLocalTable(void) {
 
 static void requireSameParameters(struct Paramstruct *declared, struct Paramstruct *defined) {
     while (declared != NULL && defined != NULL) {
-        if (declared->type != defined->type || strcmp(declared->name, defined->name) != 0)
+        if (declared->type != defined->type ||
+            declared->tupleType != defined->tupleType ||
+            declared->size != defined->size ||
+            strcmp(declared->name, defined->name) != 0)
             semanticError("function definition parameters do not match declaration", NULL);
         declared = declared->next;
         defined = defined->next;
@@ -180,6 +183,18 @@ struct TupleVar *appendTupleVar(struct TupleVar *variables, struct TupleVar *var
     return variables;
 }
 
+struct Paramstruct *makeTupleParam(char *typeName, char *name, int isPointer) {
+    struct TupleType *tupleType = LookupTupleType(typeName);
+    if (tupleType == NULL)
+        semanticError("tuple type must be declared before it is used in a function signature:", typeName);
+    struct Paramstruct *param = calloc(1, sizeof(*param));
+    param->name = name;
+    param->type = isPointer ? TYPE_TUPLE_PTR : TYPE_TUPLE;
+    param->tupleType = tupleType;
+    param->size = isPointer ? 1 : tupleType->size;
+    return param;
+}
+
 void InstallTupleType(char *name, struct Field *fields) {
     if (LookupTupleType(name) != NULL)
         semanticError("tuple type already declared:", name);
@@ -249,8 +264,10 @@ void BeginFunctionDefinition(int returnType, char *name, struct Paramstruct *par
     currentReturnType = returnType;
     nextParamBinding = -3;
     nextLocalBinding = 1;
-    for (struct Paramstruct *param = params; param != NULL; param = param->next)
-        LInstall(param->name, param->type, nextParamBinding--, 1, NULL);
+    for (struct Paramstruct *param = params; param != NULL; param = param->next) {
+        LInstall(param->name, param->type, nextParamBinding, param->size, param->tupleType);
+        nextParamBinding -= param->size;
+    }
 }
 
 void BeginMainDefinition(char *name) {
@@ -343,7 +360,7 @@ void PrintSymbolTable() { // TASK1: prints the symbol table to check whether var
 }
 
 tnode* makeAddressNode(tnode *var) { // EX2: creates an AST node for the address-of operator
-    if (var->nodetype != NODE_ID) {
+    if (var->nodetype != NODE_ID && var->nodetype != NODE_FIELD) {
         fprintf(stderr, "Address-of operator can only be used with a variable\n");
         exit(1);
     }
@@ -484,8 +501,10 @@ tnode* makeOperatorNode(char* op, tnode* l, tnode* r) {
         fprintf(stderr, "Type mismatch\n");
         exit(1);
     }
-    if (nodetype != NODE_AND && nodetype != NODE_OR &&
-        (l->type != TYPE_INT || r->type != TYPE_INT)) { // left and right operands should both be strictly int 
+    int stringComparison = (nodetype == NODE_EQ || nodetype == NODE_NE) &&
+                           l->type == TYPE_STR && r->type == TYPE_STR;
+    if (nodetype != NODE_AND && nodetype != NODE_OR && !stringComparison &&
+        (l->type != TYPE_INT || r->type != TYPE_INT)) { // left and right operands should both be strictly int
         fprintf(stderr, "Type mismatch\n");
         exit(1);
     }
@@ -517,10 +536,11 @@ tnode* makeIdNode(char *name) { //TASK2 : we storing the entry pointer in the Ge
     return node;
 }
 
-tnode *makeFieldNode(char *tupleName, char *fieldName) {
-    tnode *tuple = makeIdNode(tupleName);
+tnode *makeTupleFieldNode(tnode *tuple, char *fieldName) {
+    if (tuple->type == TYPE_TUPLE_PTR)
+        tuple = makeDereferenceNode(tuple);
     if (tuple->type != TYPE_TUPLE)
-        semanticError("field access requires a tuple variable:", tupleName);
+        semanticError("field access requires a tuple value:", tuple->varname);
     struct Field *field = LookupField(tuple->tupleType, fieldName);
     if (field == NULL)
         semanticError("tuple has no such field:", fieldName);
@@ -528,6 +548,10 @@ tnode *makeFieldNode(char *tupleName, char *fieldName) {
     node->tupleType = tuple->tupleType;
     node->field = field;
     return node;
+}
+
+tnode *makeFieldNode(char *tupleName, char *fieldName) {
+    return makeTupleFieldNode(makeIdNode(tupleName), fieldName);
 }
 
 struct ArgList *makeArgList(tnode *expr) {
@@ -551,10 +575,11 @@ tnode *makeFuncCallNode(char *name, struct ArgList *args) {
     struct Paramstruct *formal = function->paramlist;
     struct ArgList *actual = args;
     while (formal != NULL && actual != NULL) {
-        if (actual->expr->type == TYPE_TUPLE || actual->expr->type == TYPE_TUPLE_PTR)
-            semanticError("tuples cannot be passed as function arguments", name);
         if (formal->type != actual->expr->type)
             semanticError("argument type does not match function declaration:", name);
+        if ((formal->type == TYPE_TUPLE || formal->type == TYPE_TUPLE_PTR) &&
+            formal->tupleType != actual->expr->tupleType)
+            semanticError("tuple argument type does not match function declaration:", name);
         formal = formal->next;
         actual = actual->next;
     }
@@ -630,10 +655,14 @@ tnode* makeAssignNode(tnode* id, tnode* expr) {
         fprintf(stderr, "Type mismatch\n");
         exit(1);
     }
-    if (id->type == TYPE_TUPLE && id->tupleType != expr->tupleType) {
+    if ((id->type == TYPE_TUPLE || id->type == TYPE_TUPLE_PTR) && id->tupleType != expr->tupleType) {
         fprintf(stderr, "Type mismatch: tuple types differ\n");
         exit(1);
     }
+    if (id->nodetype != NODE_ID && id->nodetype != NODE_FIELD &&
+        id->nodetype != NODE_ARRAY && id->nodetype != NODE_ARRAY2D &&
+        id->nodetype != NODE_DEREFERENCE)
+        semanticError("assignment target is not writable", NULL);
     return createTree(0, id->type, NODE_ASSIGN, NULL, id, NULL, expr);
 }
 

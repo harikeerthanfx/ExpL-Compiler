@@ -83,6 +83,8 @@ struct VarList { //Since VarList contains multiple IDs, we need a way to remembe
 struct Paramstruct {
     char *name;
     int type;
+    struct TupleType *tupleType;
+    int size;
     struct Paramstruct *next;
 };
 
@@ -162,6 +164,7 @@ tnode* makeStrNode(char *s); //TASK1 forgotten crossroads(iykyk)
 tnode* makeOperatorNode(char* op, tnode* l, tnode* r);
 tnode* makeIdNode(char* name);
 tnode* makeFieldNode(char *tupleName, char *fieldName);
+tnode* makeTupleFieldNode(tnode *tuple, char *fieldName);
 tnode* makeFuncCallNode(char *name, struct ArgList *args);
 struct ArgList *makeArgList(tnode *expr);
 struct ArgList *appendArg(struct ArgList *args, tnode *expr);
@@ -195,6 +198,7 @@ struct Field *makeField(char *name, int type);
 struct Field *appendField(struct Field *fields, struct Field *field);
 struct TupleVar *makeTupleVar(char *name, int isPointer);
 struct TupleVar *appendTupleVar(struct TupleVar *variables, struct TupleVar *variable);
+struct Paramstruct *makeTupleParam(char *typeName, char *name, int isPointer);
 void PrintSymbolTable(); //for TASK1 (This is mainly for Task 1 verification.)
 
 /* Task 2 local-scope and function-definition semantic analysis. */

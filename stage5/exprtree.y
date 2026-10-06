@@ -60,7 +60,7 @@ extern int nextBinding;
 
 %type <num> Type // TASK1: Type gets INT or STR and returns TYPE_INT or TYPE_STR as an integer value
 %type <num> ReturnType
-%type <varlist> VarList // TASK1: VarList gives the variable list — because we need all variable names later
+//%type <varlist> VarList // TASK1: VarList gives the variable list — because we need all variable names later
 %type <gdecllist> Gid GidList
 %type <paramlist> Param ParamList ParamListOpt
 %type <arglist> ArgList ArgListOpt
@@ -171,12 +171,19 @@ ParamList : ParamList ',' Param {
           ;
 
 Param : Type ID {
-        $$ = calloc(1, sizeof(*$$)); $$->type = $1; $$->name = $2;
+        $$ = calloc(1, sizeof(*$$)); $$->type = $1; $$->name = $2; $$->size = 1;
     }
     | Type MUL ID {
         $$ = calloc(1, sizeof(*$$));
         $$->type = $1 == TYPE_INT ? TYPE_INT_PTR : TYPE_STR_PTR;
         $$->name = $3;
+        $$->size = 1;
+    }
+    | TUPLE ID ID {
+        $$ = makeTupleParam($2, $3, 0);
+    }
+    | TUPLE ID MUL ID {
+        $$ = makeTupleParam($2, $4, 1);
     }
     ;
 
@@ -189,13 +196,13 @@ Type : INT {
      ;
 
 //varlist updated for TASK3
+
 /*
 This supports all of these:
 int a;
 int a[10];
 int a, b[5];
 int a[10], b, c[20];
-*/
 VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to support 2D arrays by storing rows, columns, and total allocated size
             struct VarList *newVar = malloc(sizeof(struct VarList));
             newVar->name = $3;
@@ -288,6 +295,7 @@ VarList : VarList ',' ID '[' NUM ']' '[' NUM ']' { // EX1: VarList updated to su
             newVar->next = NULL;
             $$ = newVar;
      };
+*/
 
 /* Only function return types use this production.  Global/local variable
  * declarations continue using Gid's existing '*' syntax. */

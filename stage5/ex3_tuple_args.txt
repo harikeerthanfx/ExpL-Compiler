@@ -1,0 +1,32 @@
+decl
+    tuple point (int x, int y) a;
+    int sumPoint(tuple point p);
+    int setX(tuple point *p, int value);
+enddecl
+
+int sumPoint(tuple point p) {
+begin
+    return p.x + p.y;
+end
+}
+
+int setX(tuple point *p, int value) {
+begin
+    p.x = value;
+    return p.x;
+end
+}
+
+int main() {
+decl
+    int result;
+enddecl
+begin
+    a.x = 3;
+    a.y = 4;
+    write(sumPoint(a));
+    result = setX(&a, 8);
+    write(sumPoint(a));
+    return 0;
+end
+}
