@@ -1,0 +1,24 @@
+type
+    Student {
+        int marks;
+    }
+    Teacher {
+        int marks;
+    }
+endtype
+
+decl
+    Student s;
+    Teacher t;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        s = t;
+        return 0;
+    end
+}

@@ -1,0 +1,27 @@
+type
+    Student {
+        int marks;
+        str name;
+    }
+    Classroom {
+        Student student;
+        int roomNo;
+    }
+endtype
+
+decl
+    Classroom c;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        c.student.marks = 95;
+        c.student.name = "Arun";
+        c.roomNo = 12;
+        return 0;
+    end
+}

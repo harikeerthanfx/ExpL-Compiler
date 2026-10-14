@@ -1,0 +1,32 @@
+type
+    Student {
+        int marks;
+    }
+    Teacher {
+        int marks;
+    }
+endtype
+
+decl
+    Student getStudent(Teacher t);
+enddecl
+
+Student getStudent(Teacher t)
+{
+    decl
+    enddecl
+
+    begin
+        return t;
+    end
+}
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        return 0;
+    end
+}

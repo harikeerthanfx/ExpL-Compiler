@@ -1,0 +1,20 @@
+type
+    student {
+        int marks;
+    }
+endtype
+
+decl
+    student s;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+    
+    begin
+        s = NULL;
+        return 0;
+    end
+}

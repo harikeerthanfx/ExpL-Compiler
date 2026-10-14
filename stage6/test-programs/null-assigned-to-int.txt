@@ -1,0 +1,14 @@
+decl
+    int x;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+    
+    begin
+        x = NULL;
+        return 0;
+    end
+}

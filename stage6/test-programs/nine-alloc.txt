@@ -1,0 +1,29 @@
+type
+    Node {
+        int a;
+        int b;
+        int c;
+        int d;
+        int e;
+        int f;
+        int g;
+        int h;
+        int i;
+    }
+endtype
+
+decl
+    Node n;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        n = alloc();
+
+        return 0;
+    end
+}

@@ -1,0 +1,21 @@
+type
+    student {
+        int marks;
+    }
+endtype
+
+decl
+    student s;
+    int x;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        x = s.marks.data;
+        return 0;
+    end
+}

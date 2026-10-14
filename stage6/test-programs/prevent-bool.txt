@@ -1,0 +1,13 @@
+decl
+    bool b;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        return 0;
+    end
+}

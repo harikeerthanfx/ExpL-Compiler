@@ -1,0 +1,21 @@
+type
+    student {
+        int marks;
+        student next;
+    }
+endtype
+
+decl
+    student s;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+    
+    begin
+        s.next = NULL;
+        return 0;
+    end
+}

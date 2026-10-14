@@ -1,0 +1,31 @@
+type
+    Student {
+        int marks;
+    }
+endtype
+
+decl
+    Student s;
+    Student process(Student x);
+enddecl
+
+Student process(Student x)
+{
+    decl
+    enddecl
+
+    begin
+        return x;
+    end
+}
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        s = process(s);
+        return 0;
+    end
+}

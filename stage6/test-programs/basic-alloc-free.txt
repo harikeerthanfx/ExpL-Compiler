@@ -1,0 +1,25 @@
+type
+    Node {
+        int value;
+    }
+endtype
+
+decl
+    Node n;
+    int x;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        n = alloc();
+        n.value = 42;
+        write(n.value);
+        free(n);
+
+        return 0;
+    end
+}

@@ -1,0 +1,14 @@
+decl
+    int x;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        x = alloc();
+        return 0;
+    end
+}

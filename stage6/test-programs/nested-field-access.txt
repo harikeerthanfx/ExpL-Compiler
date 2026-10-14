@@ -1,0 +1,27 @@
+type
+    marks {
+        int data;
+    }
+
+    student {
+        marks subject;
+    }
+endtype
+
+decl
+    student s;
+    int x;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+    
+    begin
+        x = s.subject.data;
+        s.subject.data = 95;
+        write(s.subject.data);
+        return 0;
+    end
+}

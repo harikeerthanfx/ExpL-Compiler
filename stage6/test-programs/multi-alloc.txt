@@ -1,0 +1,39 @@
+type
+    Node {
+        int value;
+    }
+endtype
+
+decl
+    Node a, b, c;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        a = alloc();
+        b = alloc();
+        c = alloc();
+
+        a.value = 11;
+        b.value = 22;
+        c.value = 33;
+
+        write(a.value);
+        write(b.value);
+        write(c.value);
+
+        free(b);
+
+        write(a.value);
+        write(c.value);
+
+        free(a);
+        free(c);
+
+        return 0;
+    end
+}

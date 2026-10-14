@@ -1,0 +1,31 @@
+type
+    Inner {
+        int value;
+    }
+    Outer {
+        Inner child;
+    }
+endtype
+
+decl
+    Outer o;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+
+    begin
+        o = alloc();
+        o.child = alloc();
+
+        o.child.value = 77;
+        write(o.child.value);
+
+        free(o.child);
+        free(o);
+
+        return 0;
+    end
+}
