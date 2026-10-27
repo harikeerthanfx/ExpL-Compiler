@@ -1,0 +1,48 @@
+class
+A {
+    decl
+        int x;
+        int set(int n);
+        int get();
+    enddecl
+
+    int set(int n) {
+        decl
+        enddecl
+        begin
+            self.x = n;
+            return 0;
+        end
+    }
+
+    int get() {
+        decl
+        enddecl
+        begin
+            return self.x;
+        end
+    }
+}
+
+B extends A {
+    decl
+    enddecl
+}
+endclass
+
+decl
+    B b;
+    int result;
+enddecl
+
+int main()
+{
+    decl
+    enddecl
+    begin
+        b = new(B);
+        result = b.set(42);
+        write(b.get());
+        return 0;
+    end
+}

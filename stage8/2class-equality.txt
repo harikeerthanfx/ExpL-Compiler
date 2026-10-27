@@ -1,0 +1,41 @@
+class
+A {
+    decl
+        int get();
+    enddecl
+    int get() {
+        decl
+        enddecl
+        begin
+            return 10;
+        end
+    }
+}
+B extends A {
+    decl
+        int get();
+    enddecl
+    int get() {
+        decl
+        enddecl
+        begin
+            return 20;
+        end
+    }
+}
+endclass
+
+decl
+    B b1, b2;
+enddecl
+
+int main() {
+    decl
+    enddecl
+    begin
+        b1 = new(B);
+        b2 = b1;
+        write(b2.get());
+        return 0;
+    end
+}

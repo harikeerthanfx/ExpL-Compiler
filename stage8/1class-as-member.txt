@@ -1,0 +1,73 @@
+class
+A {
+    decl
+        int get();
+    enddecl
+
+    int get() {
+        decl
+        enddecl
+        begin
+            return 10;
+        end
+    }
+}
+
+B extends A {
+    decl
+        int get();
+    enddecl
+
+    int get() {
+        decl
+        enddecl
+        begin
+            return 20;
+        end
+    }
+}
+
+Holder {
+    decl
+        A item;
+        int setItem(A a);
+        int getItem();
+    enddecl
+
+    int setItem(A a) {
+        decl
+        enddecl
+        begin
+            self.item = a;
+            return 0;
+        end
+    }
+
+    int getItem() {
+        decl
+        enddecl
+        begin
+            return self.item.get();
+        end
+    }
+}
+endclass
+
+decl
+    Holder h;
+    A a;
+enddecl
+
+int main()
+{
+    decl
+        int status;
+    enddecl
+    begin
+        h = new(Holder);
+        a = new(B);
+        status = h.setItem(a);
+        write(h.getItem());
+        return 0;
+    end
+}
