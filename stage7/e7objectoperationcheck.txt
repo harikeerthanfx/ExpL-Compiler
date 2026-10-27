@@ -1,0 +1,12 @@
+decl
+    int number;
+enddecl
+
+int main() {
+    decl
+    enddecl
+    begin
+        delete(number);
+        return 0;
+    end
+}

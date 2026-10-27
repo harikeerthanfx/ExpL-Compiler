@@ -1,0 +1,21 @@
+class
+    Box {
+        decl
+            int set(int n);
+        enddecl
+
+        int set(str n) {
+            begin
+                return 1;
+            end
+        }
+    }
+endclass
+
+int main() {
+    decl
+    enddecl
+    begin
+        return 0;
+    end
+}

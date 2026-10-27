@@ -1,0 +1,15 @@
+class
+    Box {
+        decl
+        enddecl
+    }
+endclass
+
+int main() {
+    decl
+        Box localBox;
+    enddecl
+    begin
+        return 0;
+    end
+}

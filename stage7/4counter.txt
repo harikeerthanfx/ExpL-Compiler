@@ -1,0 +1,47 @@
+class
+    Counter {
+        decl
+            int value;
+            int set(int n);
+            int add(int n);
+            int get();
+        enddecl
+
+        int set(int n) {
+            begin
+                self.value = n;
+                return 1;
+            end
+        }
+
+        int add(int n) {
+            begin
+                self.value = self.value + n;
+                return 1;
+            end
+        }
+
+        int get() {
+            begin
+                return self.value;
+            end
+        }
+    }
+endclass
+
+decl
+    Counter c;
+enddecl
+
+int main() {
+    decl
+        int result;
+    enddecl
+    begin
+        c = new(Counter);
+        result = c.set(40);
+        result = c.add(2);
+        write(c.get());
+        return 0;
+    end
+}

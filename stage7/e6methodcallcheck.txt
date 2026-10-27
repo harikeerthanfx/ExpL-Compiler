@@ -1,0 +1,27 @@
+class
+    Box {
+        decl
+            int set(int n);
+        enddecl
+
+        int set(int n) {
+            begin
+                return n;
+            end
+        }
+    }
+endclass
+
+decl
+    Box b;
+enddecl
+
+int main() {
+    decl
+    enddecl
+    begin
+        b = new(Box);
+        write(b.set());
+        return 0;
+    end
+}

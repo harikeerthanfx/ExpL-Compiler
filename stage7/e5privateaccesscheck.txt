@@ -1,0 +1,20 @@
+class
+    Box {
+        decl
+            int value;
+        enddecl
+    }
+endclass
+
+decl
+    Box b;
+enddecl
+
+int main() {
+    decl
+    enddecl
+    begin
+        write(b.value);
+        return 0;
+    end
+}

@@ -1,0 +1,16 @@
+class
+    Box {
+        decl
+            int value;
+            int value;
+        enddecl
+    }
+endclass
+
+int main() {
+    decl
+    enddecl
+    begin
+        return 0;
+    end
+}
