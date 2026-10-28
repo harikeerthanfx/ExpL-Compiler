@@ -1,0 +1,57 @@
+class
+    A {
+        decl
+            int show(int x);
+        enddecl
+
+        int show(int x) {
+            begin
+                write(10);
+                return 1;
+            end
+        }
+    }
+
+    B extends A {
+        decl
+            int show(int x);
+            int show(str s);
+        enddecl
+
+        int show(int x) {
+            begin
+                write(20);
+                return 1;
+            end
+        }
+
+        int show(str s) {
+            begin
+                write(30);
+                return 1;
+            end
+        }
+    }
+endclass
+
+decl
+    A obj;
+    int n;
+enddecl
+
+int main() {
+    decl
+        int temp;
+    enddecl
+
+    begin
+        temp = Initialize();
+
+        obj = new(B);
+
+        temp = obj.show(5);
+        temp = obj.show("hello");
+
+        return 0;
+    end
+}
